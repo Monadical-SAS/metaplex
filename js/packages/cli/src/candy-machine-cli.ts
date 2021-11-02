@@ -699,7 +699,13 @@ programCommand('mint_one_token')
 
     const cacheContent = loadCache(cacheName, env);
     const configAddress = new PublicKey(cacheContent.program.config);
-    const tx = await mint(keypair, env, configAddress, rpcUrl);
+    const tx = await mint(
+      keypair,
+      env,
+      configAddress,
+      cacheContent.program.uuid,
+      rpcUrl,
+    );
 
     log.info('mint_one_token finished', tx);
   });
