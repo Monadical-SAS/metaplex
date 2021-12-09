@@ -1,8 +1,10 @@
 import { Creator, PackDistributionType } from '@oyster/common';
 import { Keypair } from '@solana/web3.js';
 import { BN } from 'bn.js';
+import { notification } from 'antd';
 
 import { SafetyDepositDraft } from '../../actions/createAuctionManager';
+import { MAX_PACKS_CREATION_COUNT } from '../../constants';
 import {
   MapSelectedItemsParams,
   MapSelectedVouchersParams,
@@ -99,7 +101,7 @@ export const mapSelectedItems = ({
     const toAccount = Keypair.generate();
 
     return {
-      index: new BN(index + 1), // Packs indexing starts from 1
+      index: index + 1, // Packs indexing starts from 1
       mint,
       maxSupply,
       weight,
@@ -120,8 +122,16 @@ export const mapSelectedVouchers = ({
       throw new Error(`No token account for the metadata: ${pubKey}`);
 
     return {
-      index: new BN(index + 1), // Packs indexing starts from 1
+      index: index + 1, // Packs indexing starts from 1
       mint,
       tokenAccount,
     };
   });
+
+export const exceededPacksCountNotification = (): void => {
+  notification.warning({
+    message: 'Exceeded Max Selected Count!',
+    description: `Maximum ${MAX_PACKS_CREATION_COUNT} items can be selected.`,
+    className: 'notification-container',
+  });
+};
