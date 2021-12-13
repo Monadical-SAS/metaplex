@@ -23,6 +23,7 @@ export async function mintEditionsToWallet(
   mintTokenAccount: TokenAccount,
   editions: number = 1,
   mintDestination: StringPublicKey,
+  startingEdition?: number,
 ) {
   const signers: Array<Array<Keypair[]>> = [];
   const instructions: Array<Array<TransactionInstruction[]>> = [];
@@ -44,7 +45,9 @@ export async function mintEditionsToWallet(
       wallet,
       connection,
       mintTokenAccount,
-      new BN(art.supply! + 1 + i),
+      startingEdition
+        ? new BN(startingEdition + 1 + i)
+        : new BN(art.supply! + 1 + i),
       mintEditionIntoWalletInstructions,
       mintEditionIntoWalletSigners,
       mintDestination,
@@ -83,8 +86,7 @@ export async function mintEditionsToWallet(
     const instructionBatch = instructions[i];
     const signerBatch = signers[i];
     console.log('Running batch', i);
-    if (instructionBatch.length >= 2)
-      // Pump em through!
+    if (instructionBatch.length >= 2) {
       await sendTransactions(
         connection,
         wallet,
@@ -93,7 +95,7 @@ export async function mintEditionsToWallet(
         SequenceType.StopOnFailure,
         'single',
       );
-    else
+    } else {
       await sendTransactionWithRetry(
         connection,
         wallet,
@@ -101,6 +103,8 @@ export async function mintEditionsToWallet(
         signerBatch[0],
         'single',
       );
+    }
+
     console.log('Done');
   }
 }
